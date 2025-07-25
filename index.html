@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scan Barcode</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+  <h2>Scan Barcode</h2>
+  <div id="reader" style="width:300px"></div>
+  <div id="result"></div>
+
+  <script>
+    const URL_SPREADSHEET = "https://script.google.com/macros/s/AKfycbwikKwQBfXoueT0fzdKEK8St8myP3IpkG_cpBhGa7dTRO7MFTIz6FAgGpwCkQF6wOWwwA/exec";
+
+    function sendToSheet(barcode) {
+      fetch(URL_SPREADSHEET, {
+        method: "POST",
+        body: JSON.stringify({ barcode }),
+        headers: { "Content-Type": "application/json" },
+      })
+      .then(res => res.json())
+      .then(res => {
+        document.getElementById("result").innerText = "Terkirim: " + barcode;
+      });
+    }
+
+    let scanner = new Html5Qrcode("reader");
+    scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 250 },
+      barcode => {
+        sendToSheet(barcode);
+        scanner.stop(); // stop setelah satu scan
+      }
+    );
+  </script>
+</body>
+</html>
